@@ -3,6 +3,5 @@
 
   outputs = _: {
     nixosModules.default = import ./modules;
-    overlays.default = import ./overlays/default.nix;
   };
 }

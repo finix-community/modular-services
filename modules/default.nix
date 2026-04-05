@@ -7,29 +7,22 @@
 }:
 let
   portable-lib = import ./portable/lib.nix { inherit lib; };
+
+  modularServiceConfiguration = portable-lib.configure {
+    serviceManagerPkgs = pkgs;
+    extraRootModules = [
+      ./finit/service.nix
+    ];
+  };
 in
 {
   imports = [
     ./finit/system.nix
-    ./synit/system.nix
   ];
 
   options = {
     system.services = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submoduleWith {
-          class = "service";
-          modules = [
-            ./portable/service.nix
-            ./finit/service.nix
-            ./synit/service.nix
-          ];
-          specialArgs = {
-            # perhaps: features."systemd" = { };
-            inherit pkgs;
-          };
-        }
-      );
+      type = lib.types.attrsOf modularServiceConfiguration.serviceSubmodule;
       default = { };
       description = ''
         A collection of modular services.
